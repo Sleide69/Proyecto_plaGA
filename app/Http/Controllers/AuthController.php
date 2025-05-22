@@ -17,15 +17,15 @@ class AuthController extends Controller
         $request->validate([
             'name' => 'required',
             'email' => 'required|email|unique:users',
-            'password' => 'required|min:6',
             'cedula' => 'required|string|max:20|unique:users,cedula',
+            'password' => 'required|min:6|confirmed',
          ]);
 
         User::create([
             'name' => $request->name,
             'email' => $request->email,
-            'password' => Hash::make($request->password),
             'cedula' => $request->cedula,
+            'password' => Hash::make($request->password),
         ]);
 
         return redirect()->route('login.form')->with('success', 'Registro exitoso. Inicia sesión.');
