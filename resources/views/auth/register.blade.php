@@ -13,6 +13,7 @@
                 @csrf
                 <input type="text" name="name" placeholder="Nombre completo" required>
                 <input type="email" name="email" placeholder="Correo electrónico" required>
+                <input type="text" name="cedula" placeholder="Cédula" required>
                 <input type="password" name="password" placeholder="Contraseña" required>
                 <input type="password" name="password_confirmation" placeholder="Confirmar contraseña" required>
                 <button class="boton" type="submit">Registrarse</button>
