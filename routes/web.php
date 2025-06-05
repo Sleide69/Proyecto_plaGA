@@ -1,33 +1,55 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\PlagaController;
+use Illuminate\Http\Request;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\PlagaController;
+use App\Http\Controllers\CapturaController;
 
 // Página de bienvenida
 Route::get('/', function () {
     return view('welcome');
 });
 
-// Registro
+// ----------------------------
+// 🔐 Autenticación
+// ----------------------------
+
 Route::get('/register', [AuthController::class, 'showRegister'])->name('register.form');
 Route::post('/register', [AuthController::class, 'register'])->name('register');
 
-// Login
 Route::get('/login', [AuthController::class, 'showLogin'])->name('login.form');
 Route::post('/login', [AuthController::class, 'login'])->name('login');
 
-// Logout
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
-// Capturar imagen (protegido)
-Route::get('/capturar-imagen', [PlagaController::class, 'mostrarFormulario'])
-    ->middleware('auth')
-    ->name('captura.imagen');
+// ----------------------------
+// 📸 Formulario de captura de imagen
+// ----------------------------
 
-Route::post('/guardar-imagen', [PlagaController::class, 'guardarImagen'])
+Route::get('/captura', [PlagaController::class, 'mostrarFormulario'])
+    ->middleware('auth')
+    ->name('formulario.captura');
+
+// ----------------------------
+// 💾 Guardar imagen y procesar
+// ----------------------------
+
+Route::post('/guardar-imagen', [CapturaController::class, 'guardarImagen'])
     ->middleware('auth')
     ->name('guardar.imagen');
 
+// ----------------------------
+// 📊 Registrar detecciones (opcional desde IA externa)
+// ----------------------------
 
+Route::post('/plagas-detectadas', function (Request $request) {
+    \App\Models\Captura::create([
+        'plaga_detectada' => $request->plaga,
+        'confianza' => $request->confianza,
+        'solucion' => $request->solucion,
+        'fecha_captura' => $request->capturado_en,
+    ]);
 
+    return response()->json(['mensaje' => 'Plaga registrada por IA']);
+});
