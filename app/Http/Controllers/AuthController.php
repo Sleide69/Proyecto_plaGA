@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Laravel\Sanctum\HasApiTokens;
 
 class AuthController extends Controller
 {
@@ -40,6 +41,13 @@ class AuthController extends Controller
 
         if (Auth::attempt($credentials)) {
             $request->session()->regenerate();
+
+            $user = Auth::user();
+
+            // ✅ Generar token Sanctum para JS/Frontend
+            $token = $user->createToken('plagas-token')->plainTextToken;
+            session(['token_sanctum' => $token]); // Guardar en sesión
+
             return redirect()->intended('/captura');
         }
 

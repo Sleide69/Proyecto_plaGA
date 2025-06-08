@@ -2,6 +2,8 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+    <meta name="token-sanctum" content="{{ session('token_sanctum') }}">
     <title>Captura de Imagen - Monitoreo</title>
     @vite(['resources/css/captura.css'])
 </head>
@@ -24,6 +26,10 @@
             </form>
         </div>
     </div>
+    <div id="notificaciones" style="margin-top: 20px; border: 1px solid #ccc; padding: 10px;">
+    <h3>🔔 Notificaciones:</h3>
+    <ul id="lista-notificaciones"></ul>
+    </div>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/webcamjs/1.0.26/webcam.min.js"></script>
     <script>
@@ -34,6 +40,31 @@
         jpeg_quality: 90
     });
     Webcam.attach('#mi_camera');
+
+    function cargarNotificaciones() {
+    fetch("http://127.0.0.1:8000/api/notificaciones", {
+        headers: {
+            "Authorization": "Bearer " + document.querySelector('meta[name="token-sanctum"]').content,
+            "Accept": "application/json"
+        }
+    })
+    .then(res => res.json())
+    .then(data => {
+        const ul = document.getElementById('lista-notificaciones');
+        ul.innerHTML = '';
+
+        data.notificaciones.forEach(noti => {
+            const li = document.createElement('li');
+            li.innerHTML = `📌 ${noti.mensaje}`;
+            li.style.padding = "4px 0";
+            ul.appendChild(li);
+        });
+    })
+    .catch(error => console.error("Error cargando notificaciones:", error));
+}
+
+document.addEventListener("DOMContentLoaded", cargarNotificaciones);
+
 
     function capturar() {
         Webcam.snap(function(data_uri) {
@@ -51,12 +82,30 @@
             })
             .then(response => response.json())
             .then(data => {
-                // Mostrar los resultados en consola (opcional)
-                console.log('Resultado Flask YOLO:', data);
+    console.log('Resultado Flask YOLO:', data);
 
-                // 3. Enviar automáticamente el formulario Laravel
-                document.querySelector('form[action="{{ route('guardar.imagen') }}"]').submit();
+        if (data.detections && data.detections.length > 0) {
+            const mensaje = data.detections.map(d => `${d.class} (${d.confidence})`).join(', ');
+
+            // Enviar notificación al backend
+            fetch("http://127.0.0.1:8000/api/notificaciones", {
+                method: "POST",
+                headers: {
+                    "Authorization": "Bearer " + document.querySelector('meta[name="token-sanctum"]').content,
+                    "Content-Type": "application/json",
+                    "Accept": "application/json",
+                    "X-CSRF-TOKEN": document.querySelector('meta[name="csrf-token"]').content
+                },
+                body: JSON.stringify({ mensaje: mensaje })
             })
+            .then(res => res.json())
+            .then(resp => console.log("Notificación enviada:", resp))
+            .catch(err => console.error("Error enviando notificación:", err));
+        }
+
+        document.querySelector('form[action="{{ route('guardar.imagen') }}"]').submit();
+    })
+
             .catch(error => {
                 document.getElementById('resultado').textContent =
                     '❌ Error al procesar la imagen: ' + error;
