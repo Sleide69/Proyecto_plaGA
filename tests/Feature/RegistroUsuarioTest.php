@@ -22,6 +22,8 @@ class RegistroUsuarioTest extends TestCase
 
         $response->assertRedirect('/login'); // ajusta según tu redirección real
 
+        $this->withSession(['_token' => csrf_token()]);
+
         $this->assertDatabaseHas('users', [
             'email' => 'usuarioxp@example.com',
             'cedula' => '1234567890',

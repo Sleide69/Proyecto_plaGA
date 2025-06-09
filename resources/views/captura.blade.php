@@ -19,11 +19,13 @@
 
             <div id="resultado" style="margin-top: 20px; font-family: monospace;"></div>
 
-            <form method="POST" action="{{ route('guardar.imagen') }}">
+            <form id="form-guardar" action="{{ route('captura.imagen') }}" method="POST" onsubmit="return false;">
                 @csrf
                 <input type="hidden" name="imagen" id="imagen">
-                <button type="submit">💾 Guardar Imagen</button>
+                <button type="button" onclick="capturar()">📸 Capturar, Analizar y Guardar</button>
             </form>
+
+
         </div>
     </div>
     <div id="notificaciones" style="margin-top: 20px; border: 1px solid #ccc; padding: 10px;">
@@ -103,7 +105,7 @@ document.addEventListener("DOMContentLoaded", cargarNotificaciones);
             .catch(err => console.error("Error enviando notificación:", err));
         }
 
-        document.querySelector('form[action="{{ route('guardar.imagen') }}"]').submit();
+        document.getElementById('form-guardar').submit();
     })
 
             .catch(error => {

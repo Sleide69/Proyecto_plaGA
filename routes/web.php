@@ -35,9 +35,9 @@ Route::get('/captura', [PlagaController::class, 'mostrarFormulario'])
 // 💾 Guardar imagen y procesar
 // ----------------------------
 
-Route::post('/guardar-imagen', [CapturaController::class, 'guardarImagen'])
+Route::post('/captura-imagen', [CapturaController::class, 'guardarImagen'])
     ->middleware('auth')
-    ->name('guardar.imagen');
+    ->name('captura.imagen');
 
 // ----------------------------
 // 📊 Registrar detecciones (opcional desde IA externa)
