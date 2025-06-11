@@ -8,7 +8,12 @@ class Notificacion extends Model
 {
     protected $fillable = ['user_id', 'mensaje', 'leido'];
 
+    protected $casts = [
+        'leido' => 'boolean',
+    ];
+
     public function user() {
         return $this->belongsTo(User::class);
     }
 }
+

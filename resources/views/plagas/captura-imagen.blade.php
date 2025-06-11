@@ -79,11 +79,15 @@
 <body>
     <h1>📊 Resultado de la Detección</h1>
 
-    <div>
-        <img src="{{ asset($imagenProcesada) }}" alt="Resultado de detección">
-    </div>
+    @if(isset($imagenProcesada))
+        <div>
+            <img src="{{ asset($imagenProcesada) }}" alt="Resultado de detección">
+        </div>
+    @else
+        <p style="color: red;">⚠️ No se pudo cargar la imagen procesada.</p>
+    @endif
 
-    @if(!empty($detecciones) && count($detecciones) > 0)
+    @if(!empty($detecciones) && is_array($detecciones) && count($detecciones) > 0)
         <div class="resultado exito">
             🐞 Se detectaron {{ count($detecciones) }} plaga(s) en la imagen.
         </div>
@@ -93,10 +97,10 @@
             @foreach($detecciones as $item)
                 <li>
                     <strong>🦠 Clase:</strong> {{ $item['name'] ?? 'N/A' }}<br>
-                    <strong>📈 Confianza:</strong> {{ isset($item['confidence']) ? round($item['confidence'] * 100, 2) . '%' : 'N/A' }}
+                    <strong>📈 Confianza:</strong>
+                    {{ isset($item['confidence']) ? round($item['confidence'] * 100, 2) . '%' : 'N/A' }}
                 </li>
             @endforeach
-
         </ul>
     @else
         <div class="resultado fallo">

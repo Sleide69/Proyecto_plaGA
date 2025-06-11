@@ -3,6 +3,8 @@ import sys
 import argparse
 import glob
 import time
+from flask import Flask, request, jsonify
+from flask_cors import CORS
 
 import cv2
 import numpy as np
@@ -247,3 +249,25 @@ elif source_type == 'picamera':
     cap.stop()
 if record: recorder.release()
 cv2.destroyAllWindows()
+
+app = Flask(__name__)
+CORS(app)
+
+# Cargar el modelo YOLO
+model = YOLO('path/to/best.pt')  # Cambia la ruta al archivo de pesos del modelo
+
+@app.route('/detect', methods=['POST'])
+def detect():
+    # Recibir la imagen desde la solicitud
+    file = request.files['image']
+    npimg = np.frombuffer(file.read(), np.uint8)
+    img = cv2.imdecode(npimg, cv2.IMREAD_COLOR)
+
+    # Procesar la imagen con YOLO
+    results = model(img)
+    detections = [{'name': model.names[int(d.cls)], 'confidence': float(d.conf)} for d in results[0].boxes]
+
+    return jsonify({'detections': detections})
+
+if __name__ == '__main__':
+    app.run(host='127.0.0.1', port=5000)

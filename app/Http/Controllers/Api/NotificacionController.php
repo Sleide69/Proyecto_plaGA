@@ -23,11 +23,16 @@ class NotificacionController extends Controller
         return response()->json(['success' => true, 'notificacion' => $noti]);
     }
 
-    public function index(Request $request) {
-        $user = $request->user();
+    public function index(Request $request)
+    {
+        $user = $request->user(); // <- obtiene el usuario autenticado
 
-        return response()->json([
-            'notificaciones' => $user->notificaciones()->latest()->get()
-        ]);
+        $notificaciones = Notificacion::where('user_id', $user->id)
+                            ->latest()
+                            ->take(10)
+                            ->get();
+
+        return response()->json(['notificaciones' => $notificaciones]);
     }
+
 }

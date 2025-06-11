@@ -10,7 +10,7 @@
         <div class="card">
             <h1>Bienvenido a AgroSenseAI</h1>
             <p>Monitoreo Inteligente de Plagas para Agricultura Sostenible</p>
-            <a href="{{ route('captura.imagen') }}" class="boton">Iniciar Monitoreo</a>
+            <a href="{{ route('login') }}" class="boton">Iniciar Monitoreo</a>
         </div>
     </div>
 </body>
