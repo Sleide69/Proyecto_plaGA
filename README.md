@@ -198,52 +198,52 @@ Proyecto_plaGA/
 │   ├── Http/
 │   │   ├── Controllers/
 │   │   │   ├── Api/
-│   │   │   │   └── NotificacionController.php   # Gestión de notificaciones API
-│   │   │   ├── CapturaController.php           # Lógica de captura y envío a Flask
-│   │   │   └── DeteccionController.php         # Lógica de detección (ej. para notificar plagas)
+│   │   │   │   └── NotificacionController.php   
+│   │   │   ├── CapturaController.php           
+│   │   │   └── DeteccionController.php        
 │   │   └── Middleware/
 │   ├── Models/
-│   │   ├── Notificacion.php                    # Modelo Eloquent para notificaciones
-│   │   └── User.php                            # Modelo de usuario
+│   │   ├── Notificacion.php                   
+│   │   └── User.php                       
 │   └── Providers/
 │
-├── config/                                     # Archivos de configuración de Laravel
+├── config/                                     
 ├── database/
-│   ├── migrations/                             # Migraciones de la base de datos
-│   │   └── YYYY_MM_DD_HHMMSS_create_notificaciones_table.php # Tu migración de notificaciones
+│   ├── migrations/                             
+│   │   └── YYYY_MM_DD_HHMMSS_create_notificaciones_table.php 
 │   └── seeders/
 │
-├── public/                                     # Raíz pública del servidor web
-│   └── storage -> ../storage/app/public        # Enlace simbólico de almacenamiento
+├── public/                                     
+│   └── storage -> ../storage/app/public        
 │
 ├── resources/
 │   ├── css/
 │   ├── js/
 │   ├── views/
 │   │   ├── plagas/
-│   │   │   └── captura-imagen.blade.php        # Vista principal de captura y resultados
-│   │   └── auth/                               # Vistas de autenticación (login, register)
+│   │   │   └── captura-imagen.blade.php        
+│   │   └── auth/                               
 │   │
 ├── routes/
-│   ├── api.php                                 # Rutas API (notificaciones, etc.)
-│   └── web.php                                 # Rutas web (captura, login, logout)
+│   ├── api.php                                 
+│   └── web.php                                 
 │
 ├── scripts/
 │   └── my_model/
-│       ├── servidor_flask.py                   # Servidor Flask para detección de IA
-│       ├── venv/                               # Entorno virtual de Python
+│       ├── servidor_flask.py                   
+│       ├── venv/                              
 │       └── train/weights/
-│           └── best.pt                         # Tu modelo YOLOv5 entrenado
+│           └── best.pt                         
 │
 ├── storage/
 │   ├── app/
 │   │   └── public/
-│   │       └── capturas/                       # Imágenes capturadas se guardan aquí
-│   └── logs/                                   # Logs de Laravel (laravel.log)
+│   │       └── capturas/                       
+│   └── logs/                                   
 │
-├── tests/                                      # Pruebas automatizadas (Unit, Feature)
+├── tests/                                      
 │   └── Feature/
-│       └── RegistroUsuarioTest.php             # Ejemplo de prueba de registro
+│       └── RegistroUsuarioTest.php             
 │
 ├── .env.example
 ├── .env
