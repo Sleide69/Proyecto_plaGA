@@ -195,60 +195,79 @@ php artisan test
 Proyecto_plaGA/
 │
 ├── app/
+│   ├── Console/
+│   ├── Exceptions/
 │   ├── Http/
 │   │   ├── Controllers/
-│   │   │   ├── Api/
-│   │   │   │   └── NotificacionController.php   
-│   │   │   ├── CapturaController.php           
-│   │   │   └── DeteccionController.php        
-│   │   └── Middleware/
+│   │   │   ├── AuthController.php
+│   │   │   ├── CapturaController.php
+│   │   │   └── PlagaController.php
+│   │   ├── Middleware/
+│   │   │   ├── Authenticate.php
+│   │   │   ├── RedirectIfAuthenticated.php
+│   │   │   └── VerifyCsrfToken.php
+│   │   └── Kernel.php
 │   ├── Models/
-│   │   ├── Notificacion.php                   
-│   │   └── User.php                       
+│   │   ├── User.php
+│   │   └── Captura.php
 │   └── Providers/
 │
-├── config/                                     
+├── bootstrap/
+│
+├── config/
+│
 ├── database/
-│   ├── migrations/                             
-│   │   └── YYYY_MM_DD_HHMMSS_create_notificaciones_table.php 
+│   ├── factories/
+│   ├── migrations/
+│   │   ├── 2024_01_01_000000_create_users_table.php
+│   │   ├── 2024_01_02_000000_create_capturas_table.php
 │   └── seeders/
 │
-├── public/                                     
-│   └── storage -> ../storage/app/public        
+├── public/
+│   ├── index.php
+│   ├── css/
+│   │   └── captura.css
+│   └── js/
+│       └── captura.js
 │
 ├── resources/
-│   ├── css/
-│   ├── js/
 │   ├── views/
+│   │   ├── auth/
+│   │   │   ├── login.blade.php
+│   │   │   └── register.blade.php
 │   │   ├── plagas/
-│   │   │   └── captura-imagen.blade.php        
-│   │   └── auth/                               
-│   │
-├── routes/
-│   ├── api.php                                 
-│   └── web.php                                 
+│   │   │   └── captura-imagen.blade.php  
+│   │   ├── captura.blade.php
+│   │   └── welcome.blade.php
+│   └── css/
 │
+├── routes/
+│   ├── web.php
+│   └── api.php
 ├── scripts/
 │   └── my_model/
 │       ├── servidor_flask.py                   
 │       ├── venv/                              
 │       └── train/weights/
-│           └── best.pt                         
-│
+│           └── best.pt 
 ├── storage/
 │   ├── app/
 │   │   └── public/
 │   │       └── capturas/                       
-│   └── logs/                                   
+│   └── logs/
 │
-├── tests/                                      
-│   └── Feature/
-│       └── RegistroUsuarioTest.php             
+├── tests/
+│   ├── Feature/
+│   │   ├── ExampleTest.php
+│   │   └── RegistroUsuarioTest.php
+│   └── Unit/
 │
-├── .env.example
 ├── .env
+├── artisan
 ├── composer.json
 ├── package.json
+├── vite.config.js
+└── server.js 
 └── README.md
 
 # 📡 Endpoints Clave de la API
