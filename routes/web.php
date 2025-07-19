@@ -30,6 +30,8 @@ Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 Route::get('/captura', [PlagaController::class, 'mostrarFormulario'])
     ->middleware('auth')
     ->name('formulario.captura');
+    
+Route::get('/captura-imagen', [CapturaController::class, 'mostrarFormulario']);
 
 // ----------------------------
 // 💾 Guardar imagen y procesar
@@ -38,6 +40,8 @@ Route::get('/captura', [PlagaController::class, 'mostrarFormulario'])
 Route::post('/captura-imagen', [CapturaController::class, 'guardarImagen'])
     ->middleware('auth')
     ->name('captura.imagen');
+
+
 
 // ----------------------------
 // 📊 Registrar detecciones (opcional desde IA externa)

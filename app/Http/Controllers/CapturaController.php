@@ -65,5 +65,11 @@ class CapturaController extends Controller
             'detecciones' => $deteccionesFiltradas,
         ]);
     }
+
+    public function mostrarFormulario()
+        {
+            return view('captura');
+        }
+
 }
 

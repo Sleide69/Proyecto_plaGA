@@ -254,7 +254,8 @@ app = Flask(__name__)
 CORS(app)
 
 # Cargar el modelo YOLO
-model = YOLO('path/to/best.pt')  # Cambia la ruta al archivo de pesos del modelo
+model = YOLO('C:/Users/emili/Videos/Proyecto_plaGA/scripts/my_model/train/weights/best.pt'
+)  # Cambia la ruta al archivo de pesos del modelo
 
 @app.route('/detect', methods=['POST'])
 def detect():

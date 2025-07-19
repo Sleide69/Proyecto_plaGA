@@ -108,6 +108,6 @@
         </div>
     @endif
 
-    <a href="{{ route('formulario.captura') }}">⬅ Volver a capturar otra imagen</a>
+    <a href="{{ route('captura.imagen') }}">⬅ Volver a capturar otra imagen</a>
 </body>
 </html>

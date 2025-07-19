@@ -62,5 +62,10 @@ class PlagaController extends Controller
 
         return $vista;
     }
+    public function mostrarFormulario()
+{
+    return view('captura'); // O 'plagas.captura' si está en una subcarpeta
+}
+
 
 }
