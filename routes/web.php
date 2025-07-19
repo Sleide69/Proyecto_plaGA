@@ -56,4 +56,5 @@ Route::post('/plagas-detectadas', function (Request $request) {
     ]);
 
     return response()->json(['mensaje' => 'Plaga registrada por IA']);
-});
+}
+);

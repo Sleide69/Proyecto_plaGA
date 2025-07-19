@@ -8,6 +8,34 @@ use Illuminate\Support\Facades\File;
 
 class PlagaController extends Controller
 {
+    /**
+     * @OA\Post(
+     *     path="/api/plagas/detectar",
+     *     summary="Detectar plagas en una imagen base64 usando YOLOv5",
+     *     tags={"Plagas"},
+     *     security={{"sanctum":{}}},
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\JsonContent(
+     *             required={"imagen"},
+     *             @OA\Property(
+     *                 property="imagen",
+     *                 type="string",
+     *                 format="base64",
+     *                 example="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD..."
+     *             )
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Vista con imagen procesada y resultados de detección"
+     *     ),
+     *     @OA\Response(
+     *         response=400,
+     *         description="Formato de imagen inválido o error en la detección"
+     *     )
+     * )
+     */
     public function guardarImagen(Request $request)
     {
         $mensajeError = null;
@@ -17,22 +45,17 @@ class PlagaController extends Controller
 
         $imagen = $request->input('imagen');
 
-        // Validar que sea imagen base64
         if (!str_starts_with($imagen, 'data:image/jpeg;base64,')) {
             $mensajeError = 'Formato de imagen inválido.';
         } else {
-            // Limpieza del base64
             $imagen = str_replace('data:image/jpeg;base64,', '', $imagen);
             $imagen = str_replace(' ', '+', $imagen);
 
-            // Nombre y ruta
             $nombreImagen = time() . '.jpg';
             $rutaLocal = storage_path('app/public/' . $nombreImagen);
 
-            // Guardar imagen
             File::put($rutaLocal, base64_decode($imagen));
 
-            // Ejecutar YOLOv5
             try {
                 $output = shell_exec("python3 scripts/detect_plaga.py " . escapeshellarg($rutaLocal));
 
@@ -55,17 +78,15 @@ class PlagaController extends Controller
             }
         }
 
-        // Retorno final
         if ($mensajeError) {
             return back()->with('error', $mensajeError);
         }
 
         return $vista;
     }
+
     public function mostrarFormulario()
-{
-    return view('captura'); // O 'plagas.captura' si está en una subcarpeta
-}
-
-
+    {
+        return view('captura');
+    }
 }

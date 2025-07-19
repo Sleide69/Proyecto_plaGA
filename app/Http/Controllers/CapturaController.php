@@ -9,35 +9,53 @@ use Illuminate\Support\Facades\Http;
 
 class CapturaController extends Controller
 {
+    /**
+     * @OA\Post(
+     *     path="/api/captura",
+     *     summary="Guardar imagen base64 y detectar plagas",
+     *     tags={"Captura"},
+     *     security={{"sanctum":{}}},
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\JsonContent(
+     *             required={"imagen"},
+     *             @OA\Property(
+     *                 property="imagen",
+     *                 type="string",
+     *                 format="base64",
+     *                 example="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD..."
+     *             )
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Vista con imagen procesada y resultados de detección"
+     *     ),
+     *     @OA\Response(
+     *         response=400,
+     *         description="No se recibió ninguna imagen"
+     *     ),
+     *     @OA\Response(
+     *         response=500,
+     *         description="Error al comunicarse con el detector de plagas"
+     *     )
+     * )
+     */
     public function guardarImagen(Request $request)
     {
-        // Verifica si se recibió la imagen base64
         $dataUri = $request->input('imagen');
         if (!$dataUri) {
             return back()->with('error', 'No se recibió ninguna imagen.');
         }
 
-        // Decodifica la imagen base64
         $image = str_replace('data:image/jpeg;base64,', '', $dataUri);
         $image = str_replace(' ', '+', $image);
         $imageData = base64_decode($image);
 
-        // Guarda la imagen en storage/app/public/capturas
         $nombreArchivo = 'capturas/' . Str::uuid() . '.jpg';
         Storage::disk('public')->put($nombreArchivo, $imageData);
         $rutaPublica = 'storage/' . $nombreArchivo;
 
-
-        // (Opcional) Guardar en BD si tienes tabla capturas
-                // \DB::table('capturas')->insert([
-                //     'imagen' => $rutaPublica,
-                //     'resultado' => json_encode($detecciones),
-                //     'created_at' => now(),
-                //     'updated_at' => now(),
-                // ]);
-
-
-        // Envía la imagen al detector Flask
         try {
             $response = Http::attach(
                 'image',
@@ -47,7 +65,6 @@ class CapturaController extends Controller
 
             $detecciones = $response->json();
 
-            // Filtra las detecciones para evitar errores
             $deteccionesFiltradas = [];
             foreach ($detecciones as $det) {
                 if (isset($det['name'], $det['confidence'])) {
@@ -59,7 +76,6 @@ class CapturaController extends Controller
             return back()->with('error', 'Error al comunicarse con el detector de plagas: ' . $e->getMessage());
         }
 
-        // Retorna la vista con resultados
         return view('plagas.captura-imagen', [
             'imagenProcesada' => $rutaPublica,
             'detecciones' => $deteccionesFiltradas,
@@ -67,9 +83,7 @@ class CapturaController extends Controller
     }
 
     public function mostrarFormulario()
-        {
-            return view('captura');
-        }
-
+    {
+        return view('captura');
+    }
 }
-

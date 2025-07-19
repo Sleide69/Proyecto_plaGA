@@ -9,12 +9,32 @@ use Illuminate\Support\Facades\Hash;
 
 class AuthController extends Controller
 {
-    // Mostrar formulario de registro
-    public function showRegister() {
-        return view('auth.register');
-    }
-
-    // Registrar un nuevo usuario
+    /**
+     * @OA\Post(
+     *     path="/api/register",
+     *     summary="Registrar un nuevo usuario",
+     *     tags={"Autenticación"},
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\JsonContent(
+     *             required={"name", "email", "cedula", "password", "password_confirmation"},
+     *             @OA\Property(property="name", type="string", example="Juan Pérez"),
+     *             @OA\Property(property="email", type="string", format="email", example="juan@example.com"),
+     *             @OA\Property(property="cedula", type="string", example="1234567890"),
+     *             @OA\Property(property="password", type="string", format="password", example="secret123"),
+     *             @OA\Property(property="password_confirmation", type="string", format="password", example="secret123")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=302,
+     *         description="Redirección al login con mensaje de éxito"
+     *     ),
+     *     @OA\Response(
+     *         response=422,
+     *         description="Error de validación"
+     *     )
+     * )
+     */
     public function register(Request $request) {
         $request->validate([
             'name' => 'required',
@@ -33,12 +53,29 @@ class AuthController extends Controller
         return redirect()->route('login.form')->with('success', 'Registro exitoso. Inicia sesión.');
     }
 
-    // Mostrar formulario de login
-    public function showLogin() {
-        return view('auth.login');
-    }
-
-    // Procesar login
+    /**
+     * @OA\Post(
+     *     path="/api/login",
+     *     summary="Iniciar sesión y obtener token Sanctum",
+     *     tags={"Autenticación"},
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\JsonContent(
+     *             required={"email", "password"},
+     *             @OA\Property(property="email", type="string", format="email", example="juan@example.com"),
+     *             @OA\Property(property="password", type="string", format="password", example="secret123")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=302,
+     *         description="Redirección a /captura si las credenciales son válidas"
+     *     ),
+     *     @OA\Response(
+     *         response=401,
+     *         description="Credenciales inválidas"
+     *     )
+     * )
+     */
     public function login(Request $request) {
         $credentials = $request->only('email', 'password');
 
@@ -47,7 +84,6 @@ class AuthController extends Controller
 
             $user = Auth::user();
 
-            // ✅ Generar token Sanctum y guardarlo en sesión
             $token = $user->createToken('plagas-token')->plainTextToken;
             session(['token_sanctum' => $token]);
 
@@ -59,11 +95,21 @@ class AuthController extends Controller
         ]);
     }
 
-    // Cerrar sesión
+    /**
+     * @OA\Post(
+     *     path="/api/logout",
+     *     summary="Cerrar sesión y eliminar tokens Sanctum",
+     *     tags={"Autenticación"},
+     *     security={{"sanctum":{}}},
+     *     @OA\Response(
+     *         response=302,
+     *         description="Redirección a la página de inicio"
+     *     )
+     * )
+     */
     public function logout(Request $request) {
         $user = $request->user();
 
-        // ✅ Eliminar todos los tokens de acceso del usuario (seguridad)
         if ($user) {
             $user->tokens()->delete();
         }
@@ -75,4 +121,13 @@ class AuthController extends Controller
 
         return redirect('/');
     }
+    public function showLogin()
+    {
+        return view('auth.login');
+    }
+    public function showRegister()
+    {
+        return view('auth.register');
+    }
+
 }
