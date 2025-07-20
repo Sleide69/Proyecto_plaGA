@@ -5,13 +5,14 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Notificacion;
+use App\Events\NuevaNotificacion;
 
 class NotificacionController extends Controller
 {
     /**
      * @OA\Post(
      *     path="/api/notificaciones",
-     *     summary="Crear una nueva notificación",
+     *     summary="Crear una nueva notificación y emitirla en tiempo real",
      *     tags={"Notificaciones"},
      *     security={{"sanctum":{}}},
      *     @OA\RequestBody(
@@ -23,7 +24,7 @@ class NotificacionController extends Controller
      *     ),
      *     @OA\Response(
      *         response=200,
-     *         description="Notificación creada exitosamente",
+     *         description="Notificación creada exitosamente y emitida por WebSocket",
      *         @OA\JsonContent(
      *             @OA\Property(property="success", type="boolean", example=true),
      *             @OA\Property(property="notificacion", type="object",
@@ -53,6 +54,9 @@ class NotificacionController extends Controller
             'mensaje' => $request->mensaje,
         ]);
 
+        // Emitir la notificación en tiempo real usando Reverb
+        event(new NuevaNotificacion($noti));
+
         return response()->json(['success' => true, 'notificacion' => $noti]);
     }
 
@@ -81,7 +85,7 @@ class NotificacionController extends Controller
      */
     public function index(Request $request)
     {
-        $user = $request->user(); // <- obtiene el usuario autenticado
+        $user = $request->user(); // obtiene el usuario autenticado
 
         $notificaciones = Notificacion::where('user_id', $user->id)
                             ->latest()

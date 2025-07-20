@@ -6,6 +6,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Http;
+// Opcional: para broadcasting en tiempo real
+// use App\Events\NuevaCapturaDetectada;
 
 class CapturaController extends Controller
 {
@@ -13,6 +15,7 @@ class CapturaController extends Controller
      * @OA\Post(
      *     path="/api/captura",
      *     summary="Guardar imagen base64 y detectar plagas",
+     *     description="Recibe una imagen en formato base64, la guarda en el servidor, la envía a un microservicio para detección de plagas y retorna la vista con la imagen procesada y los resultados.",
      *     tags={"Captura"},
      *     security={{"sanctum":{}}},
      *     @OA\RequestBody(
@@ -45,7 +48,7 @@ class CapturaController extends Controller
     {
         $dataUri = $request->input('imagen');
         if (!$dataUri) {
-            return back()->with('error', 'No se recibió ninguna imagen.');
+            return response()->json(['error' => 'No se recibió ninguna imagen.'], 400);
         }
 
         $image = str_replace('data:image/jpeg;base64,', '', $dataUri);
@@ -72,16 +75,31 @@ class CapturaController extends Controller
                 }
             }
 
+            // Opcional: Emitir evento de broadcasting con los resultados
+            // event(new NuevaCapturaDetectada($rutaPublica, $deteccionesFiltradas));
+
         } catch (\Exception $e) {
-            return back()->with('error', 'Error al comunicarse con el detector de plagas: ' . $e->getMessage());
+            return response()->json(['error' => 'Error al comunicarse con el detector de plagas: ' . $e->getMessage()], 500);
         }
 
+        // Devuelve una vista (para API REST sería mejor devolver JSON, pero así está en tu ejemplo)
         return view('plagas.captura-imagen', [
             'imagenProcesada' => $rutaPublica,
             'detecciones' => $deteccionesFiltradas,
         ]);
     }
 
+    /**
+     * @OA\Get(
+     *     path="/api/captura/formulario",
+     *     summary="Mostrar formulario para subir una imagen",
+     *     tags={"Captura"},
+     *     @OA\Response(
+     *         response=200,
+     *         description="Formulario HTML para subir imagen"
+     *     )
+     * )
+     */
     public function mostrarFormulario()
     {
         return view('captura');

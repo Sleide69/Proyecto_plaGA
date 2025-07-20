@@ -5,7 +5,7 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\PlagaController;
 use App\Http\Controllers\CapturaController;
-
+use App\Events\NuevaDeteccion;
 // Página de bienvenida
 Route::get('/', function () {
     return view('welcome');
@@ -56,5 +56,18 @@ Route::post('/plagas-detectadas', function (Request $request) {
     ]);
 
     return response()->json(['mensaje' => 'Plaga registrada por IA']);
+});
+
+
+
+Route::get('/test-deteccion', function() {
+    broadcast(new NuevaDeteccion([
+        'plaga' => 'Gusano cogollero',
+        'ubicacion' => 'Lote 2',
+        'hora' => now()->toDateTimeString(),
+    ]));
+    return 'Evento emitido';
 }
+
+
 );
