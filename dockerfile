@@ -19,7 +19,6 @@ WORKDIR /var/www/html
 # Copia los archivos del proyecto
 COPY . .
 
-RUN php artisan storage:link || true
 # Instala dependencias de PHP y JS
 RUN composer install
 RUN php artisan storage:link || true
