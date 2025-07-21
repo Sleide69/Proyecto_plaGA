@@ -2,13 +2,15 @@ from flask import Flask, request, jsonify
 from flask_cors import CORS
 from PIL import Image, UnidentifiedImageError
 from ultralytics import YOLO
-
+import os
 app = Flask(__name__)
 CORS(app)
 
 # Ruta actualizada al modelo YOLO
-MODEL_PATH = 'C:/Users/emili/Videos/Proyecto_plaGA/scripts/my_model/train/weights/best.pt'
 
+
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+MODEL_PATH = os.path.join(BASE_DIR, 'train', 'weights', 'best.pt')
 # Cargar el modelo YOLO
 try:
     model = YOLO(MODEL_PATH)

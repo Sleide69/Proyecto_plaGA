@@ -1,31 +1,39 @@
-FROM php:8.2-fpm
+services:
+  app:
+    build: .
+    ports:
+      - "8000:8000"
+    environment:
+      DB_CONNECTION: pgsql
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_DATABASE: plaga_db
+      DB_USERNAME: plaga_user
+      DB_PASSWORD: plaga_pass
+    depends_on:
+      - postgres
+    volumes:
+      - .:/var/www/html
 
-# Instala extensiones y dependencias del sistema
-RUN apt-get update && apt-get install -y \
-    libpng-dev \
-    libjpeg-dev \
-    libfreetype6-dev \
-    zip \
-    git \
-    unzip \
-    curl \
-    libonig-dev \
-    libxml2-dev \
-    && docker-php-ext-install pdo_mysql mbstring exif pcntl bcmath gd
+  postgres:
+    image: postgres:16
+    environment:
+      POSTGRES_USER: plaga_user
+      POSTGRES_PASSWORD: plaga_pass
+      POSTGRES_DB: plaga_db
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
 
-# Instala Composer
-COPY --from=composer:2.6 /usr/bin/composer /usr/bin/composer
+  script:
+      build:
+        context: ./scripts
+        dockerfile: Dockerfile
+      ports:
+        - "5000:5000"
+      volumes:
+        - ./scripts:/usr/src/app
+      depends_on:
+        - postgres
 
-# Copia el código de la app
-WORKDIR /var/www
-COPY . .
-
-# Instala dependencias de Laravel
-RUN composer install
-
-# Da permisos (¡importante para storage y cache!)
-RUN chown -R www-data:www-data /var/www \
-    && chmod -R 755 /var/www/storage
-
-EXPOSE 9000
-CMD ["php-fpm"]
+volumes:
+  postgres_data:

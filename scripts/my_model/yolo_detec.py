@@ -254,8 +254,14 @@ app = Flask(__name__)
 CORS(app)
 
 # Cargar el modelo YOLO
-model = YOLO('C:/Users/emili/Videos/Proyecto_plaGA/scripts/my_model/train/weights/best.pt'
-)  # Cambia la ruta al archivo de pesos del modelo
+import os
+from ultralytics import YOLO
+
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+MODEL_PATH = os.path.join(BASE_DIR,  'train', 'weights', 'best.pt')
+
+model = YOLO(MODEL_PATH)
+  # Cambia la ruta al archivo de pesos del modelo
 
 @app.route('/detect', methods=['POST'])
 def detect():

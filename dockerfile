@@ -1,31 +1,30 @@
-FROM php:8.2-fpm
+FROM php:8.3-fpm
 
-# Instala extensiones y dependencias del sistema
+# Instala dependencias del sistema
 RUN apt-get update && apt-get install -y \
-    libpng-dev \
-    libjpeg-dev \
-    libfreetype6-dev \
-    zip \
     git \
     unzip \
-    curl \
-    libonig-dev \
-    libxml2-dev \
-    && docker-php-ext-install pdo_mysql mbstring exif pcntl bcmath gd
+    libpq-dev \
+    nodejs \
+    npm
+
+# Instala extensiones PHP necesarias
+RUN docker-php-ext-install pdo pdo_pgsql
 
 # Instala Composer
-COPY --from=composer:2.6 /usr/bin/composer /usr/bin/composer
+COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 
-# Copia el código de la app
-WORKDIR /var/www
+WORKDIR /var/www/html
+
+# Copia los archivos del proyecto
 COPY . .
 
-# Instala dependencias de Laravel
+RUN php artisan storage:link || true
+# Instala dependencias de PHP y JS
 RUN composer install
+RUN php artisan storage:link || true
+RUN npm install && npm run build
 
-# Da permisos (¡importante para storage y cache!)
-RUN chown -R www-data:www-data /var/www \
-    && chmod -R 755 /var/www/storage
+EXPOSE 8000
 
-EXPOSE 9000
-CMD ["php-fpm"]
+CMD ["php", "artisan", "serve", "--host=0.0.0.0", "--port=8000"]

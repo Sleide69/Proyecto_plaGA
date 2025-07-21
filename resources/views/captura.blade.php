@@ -166,7 +166,7 @@
             formData.append('image', blob, 'captura.jpg');
 
             // 3. Enviar a Flask
-            fetch('http://127.0.0.1:5000/detect', {
+            fetch('http://localhost:5000/detect', {
                 method: 'POST',
                 body: formData
             })
