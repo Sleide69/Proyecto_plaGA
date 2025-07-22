@@ -41,7 +41,19 @@ Route::post('/captura-imagen', [CapturaController::class, 'guardarImagen'])
     ->middleware('auth')
     ->name('captura.imagen');
 
+// ----------------------------
+// 🖼️ Servir imágenes de capturas
+// ----------------------------
 
+Route::get('/storage/capturas/{filename}', function ($filename) {
+    $path = storage_path('app/public/capturas/' . $filename);
+    
+    if (!file_exists($path)) {
+        abort(404);
+    }
+    
+    return response()->file($path);
+})->where('filename', '[A-Za-z0-9\-\.]+')->name('captura.imagen.show');
 
 // ----------------------------
 // 📊 Registrar detecciones (opcional desde IA externa)

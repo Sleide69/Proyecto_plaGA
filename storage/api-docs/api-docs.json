@@ -97,7 +97,7 @@
                 },
                 "responses": {
                     "200": {
-                        "description": "Notificación creada exitosamente y emitida por WebSocket",
+                        "description": "Notificación creada exitosamente",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -401,68 +401,6 @@
                 ]
             }
         },
-        "/ws/usuario.{user_id}": {
-            "get": {
-                "tags": [
-                    "WebSocket"
-                ],
-                "summary": "Canal WebSocket para notificaciones en tiempo real usando Laravel Reverb",
-                "description": "\r\nConéctate al canal <b>ws://localhost:8080/usuario.{user_id}</b> para recibir notificaciones en tiempo real.<br>\r\n<ul>\r\n    <li>El parámetro <code>user_id</code> corresponde al ID del usuario autenticado.</li>\r\n    <li>Usa <b>Laravel Echo</b> en el frontend para escuchar el evento <code>.NuevaNotificacion</code> en este canal.</li>\r\n    <li>Ejemplo de conexión (con Javascript y Laravel Echo):<br>\r\n    <pre>\r\nwindow.Echo.channel('usuario.' + userId)\r\n    .listen('.NuevaNotificacion', (e) => {\r\n        console.log('Notificación:', e.notificacion);\r\n    });\r\n    </pre>\r\n    </li>\r\n</ul>\r\n<b>Nota:</b> Swagger UI y Postman <u>no permiten probar WebSockets directamente</u>. Usa una herramienta como <a href='https://www.websocketking.com/' target='_blank'>WebSocket King Client</a>, Insomnia, o tu frontend para conectarte y escuchar eventos en tiempo real.\r\n",
-                "operationId": "4af58d15ecb66b7f3820930cc4874deb",
-                "parameters": [
-                    {
-                        "name": "user_id",
-                        "in": "path",
-                        "description": "ID del usuario autenticado",
-                        "required": true,
-                        "schema": {
-                            "type": "integer"
-                        }
-                    }
-                ],
-                "responses": {
-                    "101": {
-                        "description": "Switching Protocols - Conexión WebSocket establecida"
-                    },
-                    "400": {
-                        "description": "Solicitud incorrecta (por ejemplo, falta user_id)"
-                    },
-                    "403": {
-                        "description": "No autorizado para acceder a este canal"
-                    }
-                },
-                "servers": [
-                    {
-                        "url": "ws://localhost:8080",
-                        "description": "Servidor WebSocket Reverb local"
-                    }
-                ]
-            }
-        },
-        "/ws/detecciones": {
-            "get": {
-                "tags": [
-                    "WebSocket"
-                ],
-                "summary": "Canal WebSocket global para detecciones en tiempo real usando Laravel Reverb",
-                "description": "Conéctate al canal <b>ws://localhost:8080/detecciones</b> para recibir en tiempo real las nuevas detecciones reportadas por cualquier usuario.<br>\r\n<ul>\r\n    <li>Este canal es público para todos los usuarios autenticados.</li>\r\n    <li>Usa <b>Laravel Echo</b> en el frontend para escuchar el evento <code>.NuevaDeteccion</code> en este canal.</li>\r\n    <li>Ejemplo de conexión (con Javascript y Laravel Echo):<br>\r\n    <pre>\r\nwindow.Echo.channel('detecciones')\r\n    .listen('.NuevaDeteccion', (e) => {\r\n        console.log('Nueva detección:', e.deteccion);\r\n    });\r\n    </pre>\r\n    </li>\r\n</ul>\r\n<b>Nota:</b> Swagger UI y Postman <u>no permiten probar WebSockets directamente</u>. Usa una herramienta como <a href='https://www.websocketking.com/' target='_blank'>WebSocket King Client</a>, Insomnia, o tu frontend para conectarte y escuchar eventos en tiempo real.",
-                "operationId": "af573c87c0c9bec0783d2a67c0b0f29c",
-                "responses": {
-                    "101": {
-                        "description": "Switching Protocols - Conexión WebSocket establecida"
-                    },
-                    "403": {
-                        "description": "No autorizado para acceder a este canal"
-                    }
-                },
-                "servers": [
-                    {
-                        "url": "ws://localhost:8080",
-                        "description": "Servidor WebSocket Reverb local"
-                    }
-                ]
-            }
-        },
         "/api/plagas/detectar": {
             "post": {
                 "tags": [
@@ -531,10 +469,6 @@
         {
             "name": "Detecciones",
             "description": "Detecciones"
-        },
-        {
-            "name": "WebSocket",
-            "description": "WebSocket"
         },
         {
             "name": "Plagas",

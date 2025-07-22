@@ -24,7 +24,7 @@ class NotificacionController extends Controller
      *     ),
      *     @OA\Response(
      *         response=200,
-     *         description="Notificación creada exitosamente y emitida por WebSocket",
+     *         description="Notificación creada exitosamente",
      *         @OA\JsonContent(
      *             @OA\Property(property="success", type="boolean", example=true),
      *             @OA\Property(property="notificacion", type="object",
@@ -53,9 +53,6 @@ class NotificacionController extends Controller
             'user_id' => $user->id,
             'mensaje' => $request->mensaje,
         ]);
-
-        // Emitir la notificación en tiempo real usando Reverb
-        event(new NuevaNotificacion($noti));
 
         return response()->json(['success' => true, 'notificacion' => $noti]);
     }

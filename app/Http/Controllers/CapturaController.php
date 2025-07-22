@@ -57,7 +57,7 @@ class CapturaController extends Controller
 
         $nombreArchivo = 'capturas/' . Str::uuid() . '.jpg';
         Storage::disk('public')->put($nombreArchivo, $imageData);
-        $rutaPublica = 'storage/' . $nombreArchivo;
+        $rutaPublica = Storage::disk('public')->url($nombreArchivo);
 
         try {
             $response = Http::attach(

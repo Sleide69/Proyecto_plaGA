@@ -49,9 +49,6 @@ class DeteccionController extends Controller
             'hora_detectada' => $request->hora,
         ]);
 
-        // Emitir evento WebSocket para Laravel Reverb
-        event(new NuevaDeteccion($det));
-
         return response()->json(['mensaje' => 'Detectada y guardada', 'id' => $det->id], 201);
     }
 }
