@@ -5,7 +5,6 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Notificacion;
-use App\Events\NuevaNotificacion;
 
 class NotificacionController extends Controller
 {
@@ -14,7 +13,7 @@ class NotificacionController extends Controller
      *     path="/api/notificaciones",
      *     summary="Crear una nueva notificación y emitirla en tiempo real",
      *     tags={"Notificaciones"},
-     *     security={{"sanctum":{}}},
+     *     security={{"bearerAuth":{}}},
      *     @OA\RequestBody(
      *         required=true,
      *         @OA\JsonContent(
@@ -43,7 +42,7 @@ class NotificacionController extends Controller
      * )
      */
     public function store(Request $request) {
-        $user = $request->user(); // autenticado por Sanctum
+        $user = auth('api')->user(); // autenticado por JWT
 
         $request->validate([
             'mensaje' => 'required|string|max:255',
@@ -54,6 +53,9 @@ class NotificacionController extends Controller
             'mensaje' => $request->mensaje,
         ]);
 
+        // Puedes emitir el evento aquí si lo necesitas
+        // broadcast(new NuevaNotificacion($noti));
+
         return response()->json(['success' => true, 'notificacion' => $noti]);
     }
 
@@ -62,7 +64,7 @@ class NotificacionController extends Controller
      *     path="/api/notificaciones",
      *     summary="Obtener las últimas 10 notificaciones del usuario autenticado",
      *     tags={"Notificaciones"},
-     *     security={{"sanctum":{}}},
+     *     security={{"bearerAuth":{}}},
      *     @OA\Response(
      *         response=200,
      *         description="Lista de notificaciones",
@@ -82,7 +84,7 @@ class NotificacionController extends Controller
      */
     public function index(Request $request)
     {
-        $user = $request->user(); // obtiene el usuario autenticado
+        $user = auth('api')->user(); // autenticado por JWT
 
         $notificaciones = Notificacion::where('user_id', $user->id)
                             ->latest()

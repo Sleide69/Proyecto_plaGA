@@ -1,22 +1,17 @@
 FROM php:8.3-fpm
 
-# Instala dependencias del sistema
-RUN apt-get update && apt-get install -y \
-    git \
-    unzip \
-    libpq-dev \
-    nodejs \
-    npm
-
-# Instala extensiones PHP necesarias
-RUN docker-php-ext-install pdo pdo_pgsql
-
 # Instala Composer
 COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 
 WORKDIR /var/www/html
 
-# Copia los archivos del proyecto
+# Copia solo composer.json y composer.lock primero
+COPY composer.json composer.lock ./
+
+# Instala dependencias
+RUN composer install --no-interaction --prefer-dist --optimize-autoloader
+
+# Copia el resto del proyecto
 COPY . .
 
 # Instala dependencias de PHP y JS

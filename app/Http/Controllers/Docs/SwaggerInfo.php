@@ -15,7 +15,7 @@ namespace App\Http\Controllers\Docs;
  * )
  *
  * @OA\SecurityScheme(
- *     securityScheme="sanctum",
+ *     securityScheme="bearerAuth",
  *     type="http",
  *     scheme="bearer",
  *     bearerFormat="JWT"

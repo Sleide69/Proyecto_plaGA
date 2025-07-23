@@ -13,7 +13,7 @@ class PlagaController extends Controller
      *     path="/api/plagas/detectar",
      *     summary="Detectar plagas en una imagen base64 usando YOLOv5",
      *     tags={"Plagas"},
-     *     security={{"sanctum":{}}},
+     *     security={{"bearerAuth":{}}},
      *     @OA\RequestBody(
      *         required=true,
      *         @OA\JsonContent(
@@ -28,7 +28,7 @@ class PlagaController extends Controller
      *     ),
      *     @OA\Response(
      *         response=200,
-     *         description="Vista con imagen procesada y resultados de detección"
+     *         description="Resultados de detección en JSON"
      *     ),
      *     @OA\Response(
      *         response=400,
@@ -38,51 +38,45 @@ class PlagaController extends Controller
      */
     public function guardarImagen(Request $request)
     {
-        $mensajeError = null;
-        $vista = null;
-        $detecciones = [];
-        $imagenProcesada = '';
-
         $imagen = $request->input('imagen');
 
         if (!str_starts_with($imagen, 'data:image/jpeg;base64,')) {
-            $mensajeError = 'Formato de imagen inválido.';
-        } else {
-            $imagen = str_replace('data:image/jpeg;base64,', '', $imagen);
-            $imagen = str_replace(' ', '+', $imagen);
+            return response()->json(['error' => 'Formato de imagen inválido.'], 400);
+        }
 
-            $nombreImagen = time() . '.jpg';
-            $rutaLocal = storage_path('app/public/' . $nombreImagen);
+        $imagen = str_replace('data:image/jpeg;base64,', '', $imagen);
+        $imagen = str_replace(' ', '+', $imagen);
 
-            File::put($rutaLocal, base64_decode($imagen));
+        $nombreImagen = time() . '.jpg';
+        $rutaLocal = storage_path('app/public/' . $nombreImagen);
 
-            try {
-                $output = shell_exec("python3 scripts/detect_plaga.py " . escapeshellarg($rutaLocal));
+        File::put($rutaLocal, base64_decode($imagen));
 
-                if (!$output) {
-                    $mensajeError = 'No se recibió respuesta del script de detección.';
-                } else {
-                    $detecciones = json_decode($output, true);
+        try {
+            $output = shell_exec("python3 scripts/detect_plaga.py " . escapeshellarg($rutaLocal));
 
-                    if (json_last_error() !== JSON_ERROR_NONE) {
-                        $mensajeError = 'La respuesta del detector no es un JSON válido.';
-                    } elseif (!is_array($detecciones)) {
-                        $mensajeError = 'El formato de las detecciones no es válido.';
-                    } else {
-                        $imagenProcesada = 'storage/' . $nombreImagen;
-                        $vista = view('plagas.captura-imagen', compact('detecciones', 'imagenProcesada'));
-                    }
-                }
-            } catch (\Exception $e) {
-                $mensajeError = 'Error al ejecutar la detección: ' . $e->getMessage();
+            if (!$output) {
+                return response()->json(['error' => 'No se recibió respuesta del script de detección.'], 500);
             }
-        }
 
-        if ($mensajeError) {
-            return back()->with('error', $mensajeError);
-        }
+            $detecciones = json_decode($output, true);
 
-        return $vista;
+            if (json_last_error() !== JSON_ERROR_NONE) {
+                return response()->json(['error' => 'La respuesta del detector no es un JSON válido.'], 500);
+            }
+
+            if (!is_array($detecciones)) {
+                return response()->json(['error' => 'El formato de las detecciones no es válido.'], 500);
+            }
+
+            $imagenProcesada = 'storage/' . $nombreImagen;
+            return response()->json([
+                'imagenProcesada' => $imagenProcesada,
+                'detecciones' => $detecciones,
+            ]);
+        } catch (\Exception $e) {
+            return response()->json(['error' => 'Error al ejecutar la detección: ' . $e->getMessage()], 500);
+        }
     }
 
     public function mostrarFormulario()

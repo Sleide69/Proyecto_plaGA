@@ -4,102 +4,62 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Http;
-// Opcional: para broadcasting en tiempo real
-// use App\Events\NuevaCapturaDetectada;
+use Illuminate\Support\Str;
+use App\Models\Deteccion;
+use App\Models\Notificacion;
 
 class CapturaController extends Controller
 {
-    /**
-     * @OA\Post(
-     *     path="/api/captura",
-     *     summary="Guardar imagen base64 y detectar plagas",
-     *     description="Recibe una imagen en formato base64, la guarda en el servidor, la envía a un microservicio para detección de plagas y retorna la vista con la imagen procesada y los resultados.",
-     *     tags={"Captura"},
-     *     security={{"sanctum":{}}},
-     *     @OA\RequestBody(
-     *         required=true,
-     *         @OA\JsonContent(
-     *             required={"imagen"},
-     *             @OA\Property(
-     *                 property="imagen",
-     *                 type="string",
-     *                 format="base64",
-     *                 example="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD..."
-     *             )
-     *         )
-     *     ),
-     *     @OA\Response(
-     *         response=200,
-     *         description="Vista con imagen procesada y resultados de detección"
-     *     ),
-     *     @OA\Response(
-     *         response=400,
-     *         description="No se recibió ninguna imagen"
-     *     ),
-     *     @OA\Response(
-     *         response=500,
-     *         description="Error al comunicarse con el detector de plagas"
-     *     )
-     * )
-     */
     public function guardarImagen(Request $request)
     {
         $dataUri = $request->input('imagen');
-        if (!$dataUri) {
-            return response()->json(['error' => 'No se recibió ninguna imagen.'], 400);
+        if (!$dataUri || !str_starts_with($dataUri, 'data:image/jpeg;base64,')) {
+            return response()->json(['error' => 'Formato de imagen inválido.'], 400);
         }
 
-        $image = str_replace('data:image/jpeg;base64,', '', $dataUri);
-        $image = str_replace(' ', '+', $image);
-        $imageData = base64_decode($image);
+        $imgData = base64_decode(str_replace('data:image/jpeg;base64,', '', $dataUri));
+        $filename = 'capturas/' . Str::uuid() . '.jpg';
+        Storage::disk('public')->put($filename, $imgData);
+        $rutaLocal = storage_path('app/public/' . $filename);
 
-        $nombreArchivo = 'capturas/' . Str::uuid() . '.jpg';
-        Storage::disk('public')->put($nombreArchivo, $imageData);
-        $rutaPublica = Storage::disk('public')->url($nombreArchivo);
+        $response = Http::attach(
+            'image', file_get_contents($rutaLocal), 'captura.jpg'
+        )->post('http://localhost:5000/detect');
 
-        try {
-            $response = Http::attach(
-                'image',
-                file_get_contents(storage_path('app/public/' . $nombreArchivo)),
-                'captura.jpg'
-            )->post('http://script:5000/detect');
+        if ($response->failed()) {
+            return response()->json(['error' => 'Microservicio de IA no respondió.'], 500);
+        }
 
-            $detecciones = $response->json();
+        $detecciones = $response->json();
 
-            $deteccionesFiltradas = [];
+        // Guarda la(s) detección(es) y una sola notificación con el resumen
+        if (is_array($detecciones) && count($detecciones) > 0) {
             foreach ($detecciones as $det) {
-                if (isset($det['name'], $det['confidence'])) {
-                    $deteccionesFiltradas[] = $det;
-                }
+                Deteccion::create([
+                    'user_id' => auth('api')->id(),
+                    'plaga' => $det['name'] ?? '',
+                    'ubicacion' => 'Desconocida',
+                    'hora_detectada' => now(),
+                ]);
             }
+            // Construye el mensaje resumen para la notificación
+            $mensaje = 'Detección: ' . implode(', ', array_map(function($d) {
+                return ($d['name'] ?? 'Desconocida') . ' (' . (isset($d['confidence']) ? number_format($d['confidence'] * 100, 2) : '??') . '%)';
+            }, $detecciones));
 
-            // Opcional: Emitir evento de broadcasting con los resultados
-            // event(new NuevaCapturaDetectada($rutaPublica, $deteccionesFiltradas));
-
-        } catch (\Exception $e) {
-            return response()->json(['error' => 'Error al comunicarse con el detector de plagas: ' . $e->getMessage()], 500);
+            Notificacion::create([
+                'user_id' => auth('api')->id(),
+                'mensaje' => $mensaje,
+            ]);
         }
 
-        // Devuelve una vista (para API REST sería mejor devolver JSON, pero así está en tu ejemplo)
-        return view('plagas.captura-imagen', [
-            'imagenProcesada' => $rutaPublica,
-            'detecciones' => $deteccionesFiltradas,
+        return response()->json([
+            'imagenProcesada' => Storage::url($filename),
+            'detecciones' => $detecciones,
         ]);
     }
 
-    /**
-     * @OA\Get(
-     *     path="/api/captura/formulario",
-     *     summary="Mostrar formulario para subir una imagen",
-     *     tags={"Captura"},
-     *     @OA\Response(
-     *         response=200,
-     *         description="Formulario HTML para subir imagen"
-     *     )
-     * )
-     */
     public function mostrarFormulario()
     {
         return view('captura');

@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\User;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 
 class AuthController extends Controller
@@ -26,8 +25,8 @@ class AuthController extends Controller
      *         )
      *     ),
      *     @OA\Response(
-     *         response=302,
-     *         description="Redirección al login con mensaje de éxito"
+     *         response=201,
+     *         description="Usuario registrado correctamente y token JWT retornado"
      *     ),
      *     @OA\Response(
      *         response=422,
@@ -35,28 +34,39 @@ class AuthController extends Controller
      *     )
      * )
      */
-    public function register(Request $request) {
+    public function register(Request $request)
+    {
         $request->validate([
-            'name' => 'required',
+            'name' => 'required|string|max:255',
             'email' => 'required|email|unique:users',
             'cedula' => 'required|string|max:20|unique:users,cedula',
-            'password' => 'required|min:6|confirmed',
+            'password' => 'required|string|min:6|confirmed',
         ]);
 
-        User::create([
+        $user = User::create([
             'name' => $request->name,
             'email' => $request->email,
             'cedula' => $request->cedula,
             'password' => Hash::make($request->password),
         ]);
 
-        return redirect()->route('login.form')->with('success', 'Registro exitoso. Inicia sesión.');
+        // Login automático tras registrar y devolver token
+        $token = auth('api')->attempt([
+            'email' => $request->email,
+            'password' => $request->password
+        ]);
+
+        return response()->json([
+            'message' => 'Usuario registrado correctamente.',
+            'user' => $user,
+            'token' => $token
+        ], 201);
     }
 
     /**
      * @OA\Post(
      *     path="/api/login",
-     *     summary="Iniciar sesión y obtener token Sanctum",
+     *     summary="Iniciar sesión y obtener token JWT",
      *     tags={"Autenticación"},
      *     @OA\RequestBody(
      *         required=true,
@@ -67,8 +77,8 @@ class AuthController extends Controller
      *         )
      *     ),
      *     @OA\Response(
-     *         response=302,
-     *         description="Redirección a /captura si las credenciales son válidas"
+     *         response=200,
+     *         description="Token JWT retornado si las credenciales son válidas"
      *     ),
      *     @OA\Response(
      *         response=401,
@@ -76,58 +86,59 @@ class AuthController extends Controller
      *     )
      * )
      */
-    public function login(Request $request) {
+    public function login(Request $request)
+    {
+        $request->validate([
+            'email' => 'required|email',
+            'password' => 'required|string'
+        ]);
+
         $credentials = $request->only('email', 'password');
 
-        if (Auth::attempt($credentials)) {
-            $request->session()->regenerate();
-
-            $user = Auth::user();
-
-            $token = $user->createToken('plagas-token')->plainTextToken;
-            session(['token_sanctum' => $token]);
-
-            return redirect()->intended('/captura');
+        if (!$token = auth('api')->attempt($credentials)) {
+            return response()->json([
+                'error' => 'Credenciales inválidas.'
+            ], 401);
         }
 
-        return back()->withErrors([
-            'email' => 'Las credenciales no coinciden.',
+        $user = auth('api')->user();
+
+        return response()->json([
+            'message' => 'Login exitoso',
+            'user' => $user,
+            'token' => $token
         ]);
     }
 
     /**
      * @OA\Post(
      *     path="/api/logout",
-     *     summary="Cerrar sesión y eliminar tokens Sanctum",
+     *     summary="Cerrar sesión (JWT, frontend debe eliminar el token)",
      *     tags={"Autenticación"},
-     *     security={{"sanctum":{}}},
+     *     security={{"bearerAuth":{}}},
      *     @OA\Response(
-     *         response=302,
-     *         description="Redirección a la página de inicio"
+     *         response=200,
+     *         description="Logout exitoso"
      *     )
      * )
      */
-    public function logout(Request $request) {
-        $user = $request->user();
-
-        if ($user) {
-            $user->tokens()->delete();
+    public function logout(Request $request)
+    {
+        try {
+            auth()->logout();
+            return response()->json(['message' => 'Successfully logged out']);
+        } catch (\Tymon\JWTAuth\Exceptions\JWTException $e) {
+            return response()->json(['error' => 'Token required for logout'], 401);
         }
-
-        Auth::logout();
-
-        $request->session()->invalidate();
-        $request->session()->regenerateToken();
-
-        return redirect('/');
     }
+
     public function showLogin()
     {
         return view('auth.login');
     }
+
     public function showRegister()
     {
         return view('auth.register');
     }
-
 }
