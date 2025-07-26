@@ -1,362 +1,350 @@
-# 🌿 Proyecto PlaGA: 
-Sistema de Monitoreo y Detección de Plagas
-Proyecto PlaGA es un sistema integral diseñado para el monitoreo y la detección temprana de plagas en plantas utilizando inteligencia artificial. Combina una robusta aplicación web (Laravel) con un backend de procesamiento de imágenes (Flask) para ofrecer una solución en tiempo real. Los usuarios pueden capturar imágenes de plantas, analizarlas con un modelo YOLOv5 entrenado para identificar plagas, y recibir notificaciones instantáneas sobre las detecciones. Los resultados, incluyendo las imágenes procesadas y los detalles de las plagas, se almacenan para un seguimiento histórico y una gestión eficiente.
+# 🌿 Proyecto PlaGA: Sistema de Monitoreo y Detección de Plagas
 
-# 📦 Características Principales
-Captura de Imágenes en Tiempo Real: Permite la captura de imágenes desde una cámara web o WiFi directamente desde la interfaz de usuario.
+Proyecto PlaGA es un sistema integral diseñado para el monitoreo y la detección temprana de plagas en plantas utilizando inteligencia artificial. Combina una robusta aplicación web (Laravel) con un backend de procesamiento de imágenes (Flask) para ofrecer una solución en tiempo real. Los usuarios pueden capturar imágenes de plantas, analizarlas con un modelo YOLOv8 entrenado para identificar plagas, y recibir notificaciones instantáneas sobre las detecciones.
 
-Detección Inteligente de Plagas: Utiliza un modelo YOLOv5 personalizado para identificar y clasificar plagas en las imágenes capturadas.
+## 📦 Características Principales
 
-Notificaciones Automáticas: Genera y gestiona notificaciones en tiempo real sobre las plagas detectadas, almacenándolas y mostrándolas en la interfaz.
+- **Captura de Imágenes en Tiempo Real**: Permite la captura de imágenes desde una cámara web directamente desde la interfaz de usuario.
+- **Detección Inteligente de Plagas**: Utiliza un modelo YOLOv8 personalizado para identificar y clasificar plagas en las imágenes capturadas.
+- **Autenticación Laravel Estándar**: Sistema de login/registro sin JWT, usando autenticación nativa de Laravel.
+- **Notificaciones en Tiempo Real**: Genera y gestiona notificaciones sobre las plagas detectadas.
+- **Almacenamiento Persistente**: Guarda las imágenes y resultados de detección en PostgreSQL.
+- **API RESTful**: Endpoints para comunicación entre frontend y backend de IA.
+- **Contenedorización Docker**: Configuración completa para desarrollo y despliegue.
+- **Interfaz Responsive**: Vista optimizada para mostrar resultados sin redireccionar.
 
-Almacenamiento Persistente: Guarda las imágenes originales y los resultados de detección en una base de datos para consulta y análisis histórico.
+## 🛠️ Tecnologías y Dependencias
 
-API RESTful: Proporciona endpoints para la comunicación entre el frontend, el backend de detección y la gestión de notificaciones.
+### Backend (Laravel - PHP)
+- **Laravel 10.x**: Framework PHP para lógica de negocio y API REST
+- **PostgreSQL**: Base de datos relacional principal
+- **GuzzleHttp**: Cliente HTTP para comunicación con Flask
+- **Laravel Vite**: Build tool para assets frontend
+- **Blade Templates**: Motor de plantillas
 
-Autenticación Segura: Implementa autenticación JWT para proteger los endpoints de la API.
+### Backend (Flask - Python para IA)
+- **Flask**: Micro-framework para el servidor de IA
+- **Flask-CORS**: Manejo de CORS para requests cross-origin
+- **PyTorch**: Framework de deep learning
+- **Ultralytics YOLOv8**: Modelo de detección de objetos actualizado
+- **Pillow (PIL)**: Procesamiento de imágenes
+- **OpenCV** (opcional): Procesamiento avanzado de imágenes
 
-Pruebas Automatizadas: Incluye pruebas unitarias y de integración para asegurar la fiabilidad del sistema.
+### Frontend
+- **Blade**: Motor de plantillas de Laravel
+- **JavaScript Vanilla**: Sin frameworks adicionales
+- **Webcam.js**: Librería para captura de cámara web
+- **CSS3**: Estilos responsive
 
-# 🛠️ Tecnologías y Dependencias
-Backend (Laravel - PHP)
-Laravel: Framework PHP para la lógica de negocio, autenticación, gestión de la base de datos (Eloquent ORM) y API REST.
+### Infraestructura
+- **PostgreSQL 16**: Base de datos en contenedor
+- **Nginx** (opcional): Proxy reverso para producción
 
-Laravel Sanctum: Para la autenticación API ligera y basada en tokens.
+## 💻 Requerimientos del Sistema
 
-GuzzleHttp: Cliente HTTP para las solicitudes entre Laravel y Flask.
+### Software Mínimo:
+- **Docker**: 20.x o superior + Docker Compose 2.x
+- **Git**: Para clonar el repositorio
+- **Navegador moderno**: Chrome, Firefox, Safari, Edge
 
-PostgreSQL: Base de datos relacional para almacenar usuarios, notificaciones y registros de detecciones.
+### Para Desarrollo Local (opcional):
+- **PHP**: 8.1 o superior
+- **Composer**: Última versión estable
+- **Node.js**: 16.x o superior (con npm)
+- **Python**: 3.8 o superior
+- **PostgreSQL**: 12 o superior
 
-Backend (Flask - Python para IA)
-Flask: Micro-framework Python que aloja el modelo de IA.
+### Hardware Recomendado:
+- **CPU**: Procesador moderno (4+ cores)
+- **RAM**: 8 GB o más (4 GB mínimo)
+- **Almacenamiento**: 10 GB libres
+- **Cámara**: Webcam USB o integrada
+- **GPU** (opcional): Compatible con CUDA para acelerar YOLOv8
 
-Flask-CORS: Para habilitar solicitudes de origen cruzado.
+## 📋 Instalación y Configuración
 
-PyTorch: Librería de aprendizaje automático para el motor de inferencia.
+### Opción 1: Docker (Recomendado) 🐳
 
-Ultralytics YOLOv5: Implementación del modelo de detección de objetos.
-
-Pillow (PIL): Librería para procesamiento de imágenes.
-
-Frontend
-Blade: Motor de plantillas de Laravel.
-
-Vite: Herramienta de construcción frontend para CSS y JavaScript.
-
-Webcam.js: Librería JavaScript para la interacción con la cámara.
-
-Instalación de Paquetes Principales:
-# Para Laravel (desde la raíz del proyecto)
-composer install
-npm install
-
-# Para Flask (desde scripts/my_model)
-# Después de activar el entorno virtual
-pip install flask flask-cors torch ultralytics pillow
-
-# 💻 Requerimientos del Sistema
-Software:
-PHP: Versión 8.1 o superior.
-
-Composer: Última versión estable.
-
-Node.js: Versión 16.x o superior (con npm).
-
-Python: Versión 3.8 o superior.
-
-pip: Gestor de paquetes de Python.
-
-Git: Para clonar el repositorio.
-
-Servidor Web: Apache (recomendado con XAMPP) o Nginx.
-
-Base de Datos: PostgreSQL (configurado y accesible).
-
-Hardware:
-CPU: Procesador moderno.
-
-RAM: 8 GB o más.
-
-Cámara: Webcam USB o compatible con tu sistema.
-
-GPU (opcional): Tarjeta gráfica compatible con CUDA para acelerar YOLOv5.
-
-# 📋 Guía de Instalación y Configuración
-1. Clonar el Repositorio
+```bash
+# 1. Clonar el repositorio
 git clone https://github.com/Sleide69/Proyecto_plaGA.git
 cd Proyecto_plaGA
 
-2. Configuración del Backend de Laravel
-Navega a la raíz del proyecto Proyecto_plaGA:
-
-# Instalar dependencias de Composer
-composer install
-
-# Copiar el archivo de configuración de entorno
+# 2. Copiar configuración de entorno
 cp .env.example .env
 
-# Generar la clave de la aplicación Laravel
+
+**Servicios disponibles:**
+- Laravel: http://localhost:8000
+- Flask IA: http://localhost:5000
+- PostgreSQL: localhost:5432
+
+### Opción 2: Instalación Manual 🔧
+
+#### Backend Laravel
+```bash
+# 1. Instalar dependencias
+composer install
+npm install
+
+# 2. Configurar entorno
+cp .env.example .env
 php artisan key:generate
 
-# Configurar la base de datos en el archivo .env
-# Abre el archivo .env y ajusta los detalles de conexión a tu base de datos PostgreSQL:
+# 3. Configurar base de datos en .env
 # DB_CONNECTION=pgsql
 # DB_HOST=127.0.0.1
 # DB_PORT=5432
-# DB_DATABASE=nombre_de_tu_db
-# DB_USERNAME=tu_usuario_db
-# DB_PASSWORD=tu_contraseña_db
+# DB_DATABASE=
+# DB_USERNAME=
+# DB_PASSWORD=
 
-# Ejecutar las migraciones para crear las tablas de la base de datos
-# Esto creará las tablas 'users', 'notificaciones', etc.
+# 4. Ejecutar migraciones
 php artisan migrate
 
-# Crear el enlace simbólico para el almacenamiento público de imágenes
-# Crucial para que las imágenes guardadas en storage/app/public sean accesibles vía URL.
+# 5. Crear enlace de storage
 php artisan storage:link
-# Si ya existe, es normal que muestre "No se puede crear un archivo que ya existe."
 
-3. Configuración del Frontend
-Desde la raíz del proyecto:
-
-# Instalar dependencias de Node.js (Vite)
-npm install
-
-# Compilar los assets de frontend para desarrollo
+# 6. Compilar assets
 npm run dev
-# Para producción, usar: npm run build
+```
 
-4. Configuración del Backend de IA (Flask)
-Navega a la carpeta de los scripts de Python:
-
+#### Backend Flask (IA)
+```bash
+# 1. Navegar a la carpeta del modelo
 cd scripts/my_model
 
-Crea y activa un entorno virtual de Python, luego instala las dependencias:
-
-# Crear entorno virtual
+# 2. Crear entorno virtual
 python -m venv venv
 
-# Activar entorno virtual
-# En Windows:
+# 3. Activar entorno virtual
+# Windows:
 .\venv\Scripts\activate
-# En macOS/Linux:
+# Linux/macOS:
 source venv/bin/activate
 
-# Instalar dependencias de Python
+# 4. Instalar dependencias
 pip install flask flask-cors torch ultralytics pillow
 
-# Desactivar el entorno virtual (opcional, puedes dejarlo activo si vas a iniciar Flask de inmediato)
-deactivate
+# 5. Verificar que el modelo best.pt existe en train/weights/
+```
 
-Ubicación del Modelo YOLOv5 (best.pt):
-Asegúrate de que tu archivo best.pt (el modelo YOLOv5 entrenado) se encuentre en la ruta correcta, tal como se especifica en tu servidor_flask.py (por defecto: C:/xampp/htdocs/Proyecto_plaGA/scripts/my_model/train/weights/best.pt).
-
-5. Ejecutar los Servidores
-Necesitarás dos terminales abiertas simultáneamente:
-
-Terminal 1: Servidor Laravel
-
-Navega a la raíz del proyecto Proyecto_plaGA:
-
+#### Ejecutar servidores (Manual)
+```bash
+# Terminal 1: Laravel
 php artisan serve
 
-El servidor Laravel estará accesible en http://127.0.0.1:8000.
-
-Terminal 2: Servidor Flask (AI Processing)
-
-Navega a la carpeta de tu script de Flask (scripts/my_model):
-
+# Terminal 2: Flask
 cd scripts/my_model
-
-# Activa tu entorno virtual si lo desactivaste (muy importante)
-# En Windows:
-.\venv\Scripts\activate
-# En macOS/Linux:
-source venv/bin/activate
-
-# Iniciar el servidor Flask
+.\venv\Scripts\activate  # Windows
 python servidor_flask.py
+```
 
-El servidor Flask estará accesible en http://127.0.0.1:5000.
+## 🚀 Uso de la Aplicación
 
-6. Acceder a la Aplicación
-Con ambos servidores en ejecución, abre tu navegador web y ve a:
+1. **Acceder**: http://localhost:8000
+2. **Registrarse/Iniciar sesión**: Usar el sistema de autenticación Laravel
+3. **Ir a captura**: Navegar a la sección de captura de imágenes
+4. **Permitir cámara**: Autorizar acceso a la webcam
+5. **Capturar imagen**: Hacer clic en "📸 Capturar y Analizar"
+6. **Ver resultados**: Los resultados aparecen en la misma página sin redirección
 
-http://127.0.0.1:8000
+## 📁 Estructura del Proyecto
 
-Si has configurado un Virtual Host (ej. proyecto-plaga.test), accede a través de ese dominio. Asegúrate de iniciar sesión en tu aplicación Laravel para que el sistema de notificaciones funcione correctamente, ya que utiliza autenticación Sanctum.
-
-# 🧪 Pruebas
-Para ejecutar las pruebas de Laravel (Unitarias y de Característica):
-
-php artisan test
-
-# 📁 Estructura del Proyecto (Vista General)
+```
 Proyecto_plaGA/
 │
-├── app/
-│   ├── Console/
-│   ├── Exceptions/
-│   ├── Http/
-│   │   ├── Controllers/
-│   │   │   ├── AuthController.php
-│   │   │   ├── CapturaController.php
-│   │   │   └── PlagaController.php
-│   │   ├── Middleware/
-│   │   │   ├── Authenticate.php
-│   │   │   ├── RedirectIfAuthenticated.php
-│   │   │   └── VerifyCsrfToken.php
-│   │   └── Kernel.php
-│   ├── Models/
-│   │   ├── User.php
-│   │   └── Captura.php
-│   └── Providers/
+├── 🐳 Docker
+│   ├── docker-compose.yml          # Orquestación de servicios
+│   ├── dockerfile                  # Contenedor Laravel
+│   └── docker-entrypoint.sh        # Script de inicialización
 │
-├── bootstrap/
-│
-├── config/
-│
-├── database/
-│   ├── factories/
-│   ├── migrations/
-│   │   ├── 2024_01_01_000000_create_users_table.php
-│   │   ├── 2024_01_02_000000_create_capturas_table.php
-│   └── seeders/
-│
-├── public/
-│   ├── index.php
-│   ├── css/
-│   │   └── captura.css
-│   └── js/
-│       └── captura.js
-│
-├── resources/
-│   ├── views/
-│   │   ├── auth/
-│   │   │   ├── login.blade.php
-│   │   │   └── register.blade.php
-│   │   ├── plagas/
-│   │   │   └── captura-imagen.blade.php  
-│   │   ├── captura.blade.php
-│   │   └── welcome.blade.php
-│   └── css/
-│
-├── routes/
-│   ├── web.php
-│   └── api.php
-├── scripts/
-│   └── my_model/
-│       ├── servidor_flask.py                   
-│       ├── venv/                              
-│       └── train/weights/
-│           └── best.pt 
-├── storage/
+├── 🎨 Frontend & Backend Laravel
 │   ├── app/
-│   │   └── public/
-│   │       └── capturas/                       
-│   └── logs/
+│   │   ├── Http/Controllers/
+│   │   │   ├── AuthController.php   # Autenticación sin JWT
+│   │   │   ├── CapturaController.php # Manejo de imágenes
+│   │   │   └── PlagaController.php   # Lógica de plagas
+│   │   └── Models/
+│   │       ├── User.php             # Sin HasApiTokens
+│   │       ├── Captura.php          # Registro de capturas
+│   │       └── Notificacion.php     # Sistema de notificaciones
+│   │
+│   ├── config/
+│   │   └── app.php                  # Sin JWT providers
+│   │
+│   ├── resources/views/
+│   │   ├── auth/
+│   │   │   ├── login.blade.php      # Login estándar
+│   │   │   └── register.blade.php   # Registro
+│   │   ├── plagas/
+│   │   │   └── captura-imagen.blade.php # Resultado de detección
+│   │   └── captura.blade.php        # Captura de cámara
+│   │
+│   └── routes/
+│       ├── web.php                  # Rutas web sin middleware JWT
+│       └── api.php                  # API endpoints (/api/captura)
 │
-├── tests/
-│   ├── Feature/
-│   │   ├── ExampleTest.php
-│   │   └── RegistroUsuarioTest.php
-│   └── Unit/
+├── 🤖 Backend IA (Flask)
+│   └── scripts/
+│       ├── dockerfile               # Contenedor Flask
+│       └── my_model/
+│           ├── servidor_flask.py    # Servidor IA actualizado
+│           ├── venv/                # Entorno virtual Python
+│           └── train/weights/
+│               └── best.pt          # Modelo YOLOv8
 │
-├── .env
-├── artisan
-├── composer.json
-├── package.json
-├── vite.config.js
-└── server.js 
-└── README.md
+├── 💾 Database & Storage
+│   ├── database/migrations/         # Migraciones sin JWT
+│   └── storage/app/public/capturas/ # Imágenes guardadas
+│
+├── ⚙️ Configuración
+│   ├── .env                         # Variables de entorno
+│   ├── .env.example                 # Template de configuración
+│   ├── composer.json                # Sin tymon/jwt-auth
+│   └── package.json                 # Dependencies frontend
+│
+└── 📚 Documentación
+    └── README.md                    # Este archivo
+```
 
-# 📡 Endpoints Clave de la API
-📍 Detección de Plagas (Flask)
+## 📡 API Endpoints
+
+### 🔍 Detección de Plagas (Flask)
+```http
 POST http://127.0.0.1:5000/detect
-
-Envía una imagen (multipart/form-data) para detección de plagas.
-
-Cuerpo de solicitud:
 Content-Type: multipart/form-data
+
 Body: image (file)
+```
 
-Ejemplo de respuesta:
-[
-  {
-    "name": "mosquito",
-    "confidence": 0.95
-  },
-  {
-    "name": "araña",
-    "confidence": 0.88
-  }
-]
-
-# 📍 Notificaciones (Laravel API)
-Las rutas de notificaciones requieren autenticación con Laravel Sanctum (token JWT en el encabezado Authorization: Bearer).
-
-GET /api/notificaciones
-Lista las últimas 10 notificaciones del usuario autenticado.
-
-Encabezado requerido:
-Authorization: Bearer {tu_token_sanctum}
-Accept: application/json
-
-Ejemplo de respuesta:
+**Respuesta actualizada:**
+```json
 {
-  "notificaciones": [
+  "detecciones": [
     {
-      "id": 1,
-      "user_id": 1,
-      "mensaje": "Plagas detectadas: mosquito (95.00%), araña (88.00%)",
-      "leida": false,
-      "created_at": "2023-10-27T10:00:00.000000Z",
-      "updated_at": "2023-10-27T10:00:00.000000Z"
+      "name": "pulgon",
+      "confidence": 0.85
     },
     {
-      "id": 2,
-      "user_id": 1,
-      "mensaje": "No se detectaron plagas en la última imagen.",
-      "leida": false,
-      "created_at": "2023-10-27T09:30:00.000000Z",
-      "updated_at": "2023-10-27T09:30:00.000000Z"
+      "name": "mosca_blanca", 
+      "confidence": 0.72
     }
   ]
 }
+```
 
-POST /api/notificaciones
-Crea una nueva notificación.
-
-Encabezados requeridos:
-Authorization: Bearer {tu_token_sanctum}
+### 📸 Captura de Imagen (Laravel)
+```http
+POST /api/captura
 Content-Type: application/json
-Accept: application/json
 
-Cuerpo de solicitud:
 {
-  "mensaje": "Plagas detectadas: pulgón (0.75), cochinilla (0.60)"
+  "imagen": "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQ..."
 }
+```
 
-Ejemplo de respuesta:
+**Respuesta:**
+```json
 {
   "success": true,
-  "notificacion": {
-    "user_id": 1,
-    "mensaje": "Plagas detectadas: pulgón (0.75), cochinilla (0.60)",
-    "leida": false,
-    "updated_at": "2023-10-27T11:00:00.000000Z",
-    "created_at": "2023-10-27T11:00:00.000000Z",
-    "id": 3
-  }
+  "detecciones": [...],
+  "imagen_guardada": "storage/capturas/imagen_123.jpg",
+  "mensaje": "Imagen procesada correctamente"
 }
+```
 
-📝 Notas Importantes
-Asegúrate de que tu usuario esté autenticado en Laravel para que las llamadas a las APIs de notificaciones funcionen correctamente.
+### 🔔 Notificaciones (Laravel)
+```http
+GET /api/notificaciones
+Authorization: Session-based (Laravel Auth)
+```
 
-Verifica la ruta de tu modelo best.pt en servidor_flask.py para que coincida con la ubicación real.
 
-Si experimentas errores 404 al cargar imágenes, verifica que php artisan storage:link se ejecutó correctamente y que tu servidor web (Apache) está configurado para servir la carpeta public de Laravel.
+## 🔧 Troubleshooting
 
-Para entornos de producción, considera configurar un servidor WSGI (como Gunicorn para Flask) y un servidor HTTP más robusto (como Nginx o Apache) para tu aplicación Laravel, en lugar de los servidores de desarrollo.
+### Problemas Comunes
 
-Cambia las claves JWT y las credenciales por defecto por valores seguros en producción.
+**❌ Error 404 en `/api/captura`**
+```bash
+# Verificar que la ruta existe
+cat routes/api.php | grep captura
+
+# Limpiar cache de rutas
+php artisan route:clear
+```
+
+**❌ Modelo YOLOv8 no carga**
+```bash
+# Verificar ruta en servidor_flask.py
+ls -la scripts/my_model/train/weights/best.pt
+
+# Probar carga manual
+python -c "from ultralytics import YOLO; YOLO('path/to/best.pt')"
+```
+
+**❌ Imágenes no se muestran**
+```bash
+# Recrear enlace de storage
+php artisan storage:link --force
+
+# Verificar permisos
+chmod -R 755 storage/
+chmod -R 755 public/storage/
+```
+
+**❌ Docker exec format error**
+```bash
+# Convertir docker-entrypoint.sh a formato Unix
+dos2unix docker-entrypoint.sh
+# O en VS Code: cambiar CRLF a LF
+```
+
+**❌ Flask no conecta**
+```bash
+# Verificar que Flask está corriendo
+curl http://127.0.0.1:5000/
+
+
+
+### Logs Importantes
+
+```bash
+# Laravel logs
+tail -f storage/logs/laravel.log
+
+# Flask logs (si ejecutas manual)
+cd scripts/my_model
+python servidor_flask.py  # Ver output directo
+```
+
+## 🚀 Despliegue en Producción
+
+### Preparación
+```bash
+# 1. Configurar .env para producción
+APP_ENV=production
+APP_DEBUG=false
+
+# 2. Generar clave segura
+php artisan key:generate
+
+# 3. Optimizar para producción
+php artisan config:cache
+php artisan route:cache
+php artisan view:cache
+npm run build
+```
+
+### Recomendaciones de Seguridad
+- Usar HTTPS en producción
+- Configurar firewall (solo puertos 80, 443)
+- Actualizar regularmente las dependencias
+- Usar variables de entorno seguras
+- Configurar backup automático de base de datos
+- Monitorear logs de seguridad
+
+
+---
+
+**Desarrollado con ❤️ para la detección inteligente de plagas**

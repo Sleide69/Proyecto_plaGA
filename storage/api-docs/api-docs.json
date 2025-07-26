@@ -65,7 +65,7 @@
                 },
                 "security": [
                     {
-                        "sanctum": []
+                        "bearerAuth": []
                     }
                 ]
             },
@@ -145,7 +145,7 @@
                 },
                 "security": [
                     {
-                        "sanctum": []
+                        "bearerAuth": []
                     }
                 ]
             }
@@ -200,8 +200,8 @@
                     }
                 },
                 "responses": {
-                    "302": {
-                        "description": "Redirección al login con mensaje de éxito"
+                    "201": {
+                        "description": "Usuario registrado correctamente y token JWT retornado"
                     },
                     "422": {
                         "description": "Error de validación"
@@ -214,7 +214,7 @@
                 "tags": [
                     "Autenticación"
                 ],
-                "summary": "Iniciar sesión y obtener token Sanctum",
+                "summary": "Iniciar sesión y obtener token JWT",
                 "operationId": "a3b306d14572d1f4bd6c064b3233e7b8",
                 "requestBody": {
                     "required": true,
@@ -243,8 +243,8 @@
                     }
                 },
                 "responses": {
-                    "302": {
-                        "description": "Redirección a /captura si las credenciales son válidas"
+                    "200": {
+                        "description": "Token JWT retornado si las credenciales son válidas"
                     },
                     "401": {
                         "description": "Credenciales inválidas"
@@ -257,88 +257,45 @@
                 "tags": [
                     "Autenticación"
                 ],
-                "summary": "Cerrar sesión y eliminar tokens Sanctum",
+                "summary": "Cerrar sesión (JWT, frontend debe eliminar el token)",
                 "operationId": "fe8f3429cd6979b3b4517e186505f9f9",
                 "responses": {
-                    "302": {
-                        "description": "Redirección a la página de inicio"
-                    }
-                },
-                "security": [
-                    {
-                        "sanctum": []
-                    }
-                ]
-            }
-        },
-        "/api/captura": {
-            "post": {
-                "tags": [
-                    "Captura"
-                ],
-                "summary": "Guardar imagen base64 y detectar plagas",
-                "description": "Recibe una imagen en formato base64, la guarda en el servidor, la envía a un microservicio para detección de plagas y retorna la vista con la imagen procesada y los resultados.",
-                "operationId": "9e7e4282137529451f8b04d7442aed17",
-                "requestBody": {
-                    "required": true,
-                    "content": {
-                        "application/json": {
-                            "schema": {
-                                "required": [
-                                    "imagen"
-                                ],
-                                "properties": {
-                                    "imagen": {
-                                        "type": "string",
-                                        "format": "base64",
-                                        "example": "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD..."
-                                    }
-                                },
-                                "type": "object"
-                            }
-                        }
-                    }
-                },
-                "responses": {
                     "200": {
-                        "description": "Vista con imagen procesada y resultados de detección"
-                    },
-                    "400": {
-                        "description": "No se recibió ninguna imagen"
-                    },
-                    "500": {
-                        "description": "Error al comunicarse con el detector de plagas"
+                        "description": "Logout exitoso"
                     }
                 },
                 "security": [
                     {
-                        "sanctum": []
+                        "bearerAuth": []
                     }
                 ]
             }
         },
-        "/api/captura/formulario": {
+        "/api/deteccion": {
             "get": {
                 "tags": [
-                    "Captura"
+                    "Detecciones"
                 ],
-                "summary": "Mostrar formulario para subir una imagen",
-                "operationId": "fddd2ce756277d208080d4fff29e07c2",
+                "summary": "Obtener las detecciones del usuario autenticado",
+                "operationId": "9b6bf8b8bba8b347a05565bdc4f5594f",
                 "responses": {
                     "200": {
-                        "description": "Formulario HTML para subir imagen"
+                        "description": "Lista de detecciones"
                     }
-                }
-            }
-        },
-        "/api/detecciones": {
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
             "post": {
                 "tags": [
                     "Detecciones"
                 ],
                 "summary": "Registrar una detección de plaga",
-                "description": "Registra una nueva detección de plaga asociada al usuario autenticado. Este endpoint requiere autenticación (Sanctum).",
-                "operationId": "c941fcd02ee2d40c7e337af308c03987",
+                "description": "Registra una nueva detección de plaga asociada al usuario autenticado. Este endpoint requiere autenticación (JWT).",
+                "operationId": "610223a6c636bdb93a3cef61d9e4ed9f",
                 "requestBody": {
                     "required": true,
                     "content": {
@@ -396,7 +353,7 @@
                 },
                 "security": [
                     {
-                        "sanctum": []
+                        "bearerAuth": []
                     }
                 ]
             }
@@ -430,7 +387,7 @@
                 },
                 "responses": {
                     "200": {
-                        "description": "Vista con imagen procesada y resultados de detección"
+                        "description": "Resultados de detección en JSON"
                     },
                     "400": {
                         "description": "Formato de imagen inválido o error en la detección"
@@ -438,7 +395,7 @@
                 },
                 "security": [
                     {
-                        "sanctum": []
+                        "bearerAuth": []
                     }
                 ]
             }
@@ -446,7 +403,7 @@
     },
     "components": {
         "securitySchemes": {
-            "sanctum": {
+            "bearerAuth": {
                 "type": "http",
                 "bearerFormat": "JWT",
                 "scheme": "bearer"
@@ -461,10 +418,6 @@
         {
             "name": "Autenticación",
             "description": "Autenticación"
-        },
-        {
-            "name": "Captura",
-            "description": "Captura"
         },
         {
             "name": "Detecciones",
